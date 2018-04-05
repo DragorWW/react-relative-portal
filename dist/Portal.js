@@ -79,7 +79,7 @@ var Portal = function (_React$Component) {
         }
       };
 
-      document.addEventListener('click', _this.handleOutClick);
+      document.addEventListener('click', _this.handleOutClick, true);
     }
     return _this;
   }
