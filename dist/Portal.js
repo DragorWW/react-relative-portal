@@ -24,8 +24,6 @@ var _exenv = require('exenv');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -42,8 +40,6 @@ var Portal = function (_React$Component) {
 
     if (_exenv.canUseDOM) {
       _this.node = document.createElement('div');
-      document.body.appendChild(_this.node);
-
       _this.root = null;
       _this.handleRootRef = function (root) {
         _this.root = root;
@@ -66,14 +62,11 @@ var Portal = function (_React$Component) {
   }
 
   _createClass(Portal, [{
-    key: 'componentWillUpdate',
-    value: function componentWillUpdate(_ref) {
-      var onOutClick = _ref.onOutClick,
-          props = _objectWithoutProperties(_ref, ['onOutClick']);
-
-      // eslint-disable-line no-unused-vars
-      // It's recommended to use `ref` callbacks instead of `findDOMNode`. https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/no-find-dom-node.md
-      _reactDom2.default.unstable_renderSubtreeIntoContainer(this, _react2.default.createElement('div', _extends({}, props, { ref: this.handleRootRef })), this.node);
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      if (_exenv.canUseDOM) {
+        document.body.appendChild(this.node);
+      }
     }
   }, {
     key: 'componentWillUnmount',
@@ -86,7 +79,11 @@ var Portal = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      return null;
+      return _reactDom2.default.createPortal(_react2.default.createElement(
+        'div',
+        _extends({}, this.props, { ref: this.handleRootRef }),
+        this.props.children
+      ), this.node);
     }
   }]);
 

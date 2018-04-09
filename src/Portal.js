@@ -14,8 +14,6 @@ export default class Portal extends React.Component {
 
     if (canUseDOM) {
       this.node = document.createElement('div');
-      document.body.appendChild(this.node);
-
       this.root = null;
       this.handleRootRef = (root) => {
         this.root = root;
@@ -34,14 +32,10 @@ export default class Portal extends React.Component {
       document.addEventListener('click', this.handleOutClick, true);
     }
   }
-
-  componentWillUpdate({ onOutClick, ...props }) {  // eslint-disable-line no-unused-vars
-    // It's recommended to use `ref` callbacks instead of `findDOMNode`. https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/no-find-dom-node.md
-    ReactDOM.unstable_renderSubtreeIntoContainer(
-      this,
-      <div {...props} ref={this.handleRootRef} />,
-      this.node
-    );
+  componentDidMount() {
+    if (canUseDOM) {
+      document.body.appendChild(this.node);
+    }
   }
 
   componentWillUnmount() {
@@ -52,7 +46,10 @@ export default class Portal extends React.Component {
   }
 
   render() {
-    return null;
+    return ReactDOM.createPortal(
+      <div {...this.props} ref={this.handleRootRef}>{this.props.children}</div>,
+      this.node,
+    );
   }
 
 }
