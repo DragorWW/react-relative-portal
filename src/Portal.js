@@ -18,34 +18,15 @@ export default class Portal extends React.Component {
 
       this.root = null;
       this.handleRootRef = (root) => {
-        if (root !== this.root) {
-          if (this.root) {
-            this.root.removeEventListener('click', this.handleInClick);
-          }
-          if (root) {
-            root.addEventListener('click', this.handleInClick);
-          }
-        }
         this.root = root;
       };
 
-      // The previous implementation triggered `onOutClick` after a click in the `Portal` content
-      // if it gets re-rendered during that click. It assumed that if the clicked element
-      // is not found in the root element via `root.contains(e.target)`, it's outside.
-      // But if after re-render the clicked element gets removed from the DOM, so it cannot be found
-      // in the root element. Instead we capture and flag the click event before it bubbles up
-      // to the `document` to be handled by `handleOutClick`.
-      this.isInClick = false;
-      this.handleInClick = () => {
-        this.isInClick = true;
-      };
-
       this.handleOutClick = (e) => {
-        const isOutClick = !this.isInClick;
-        this.isInClick = false;
-
         const { onOutClick } = this.props;
-        if (isOutClick && typeof onOutClick === 'function') {
+        if (this.root && !this.root.contains(e.target)  && typeof onOutClick === 'function') {
+          onOutClick(e);
+        }
+        if (!this.root && typeof onOutClick === 'function') {
           onOutClick(e);
         }
       };
@@ -65,10 +46,6 @@ export default class Portal extends React.Component {
 
   componentWillUnmount() {
     if (canUseDOM) {
-      // `this.handleRootRef` won't be called with `null`, so cleanup here.
-      if (this.root) {
-        this.root.removeEventListener('click', this.handleInClick);
-      }
       document.removeEventListener('click', this.handleOutClick, true);
       document.body.removeChild(this.node);
     }

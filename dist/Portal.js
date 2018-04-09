@@ -46,35 +46,16 @@ var Portal = function (_React$Component) {
 
       _this.root = null;
       _this.handleRootRef = function (root) {
-        if (root !== _this.root) {
-          if (_this.root) {
-            _this.root.removeEventListener('click', _this.handleInClick);
-          }
-          if (root) {
-            root.addEventListener('click', _this.handleInClick);
-          }
-        }
         _this.root = root;
       };
 
-      // The previous implementation triggered `onOutClick` after a click in the `Portal` content
-      // if it gets re-rendered during that click. It assumed that if the clicked element
-      // is not found in the root element via `root.contains(e.target)`, it's outside.
-      // But if after re-render the clicked element gets removed from the DOM, so it cannot be found
-      // in the root element. Instead we capture and flag the click event before it bubbles up
-      // to the `document` to be handled by `handleOutClick`.
-      _this.isInClick = false;
-      _this.handleInClick = function () {
-        _this.isInClick = true;
-      };
-
       _this.handleOutClick = function (e) {
-        var isOutClick = !_this.isInClick;
-        _this.isInClick = false;
-
         var onOutClick = _this.props.onOutClick;
 
-        if (isOutClick && typeof onOutClick === 'function') {
+        if (_this.root && !_this.root.contains(e.target) && typeof onOutClick === 'function') {
+          onOutClick(e);
+        }
+        if (!_this.root && typeof onOutClick === 'function') {
           onOutClick(e);
         }
       };
@@ -98,10 +79,6 @@ var Portal = function (_React$Component) {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       if (_exenv.canUseDOM) {
-        // `this.handleRootRef` won't be called with `null`, so cleanup here.
-        if (this.root) {
-          this.root.removeEventListener('click', this.handleInClick);
-        }
         document.removeEventListener('click', this.handleOutClick, true);
         document.body.removeChild(this.node);
       }
