@@ -69,7 +69,7 @@ export default class Portal extends React.Component {
       if (this.root) {
         this.root.removeEventListener('click', this.handleInClick);
       }
-      document.removeEventListener('click', this.handleOutClick);
+      document.removeEventListener('click', this.handleOutClick, true);
       document.body.removeChild(this.node);
     }
   }
